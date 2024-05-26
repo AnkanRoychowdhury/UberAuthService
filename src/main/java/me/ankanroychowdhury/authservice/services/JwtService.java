@@ -24,7 +24,7 @@ public class JwtService implements CommandLineRunner {
     @Value("${jwt.secret}")
     private String SECRET;
 
-    private String createToken(Map<String, Object> claims, String email) {
+    public String createToken(Map<String, Object> claims, String email) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + EXPIRY + 1000L);
         return Jwts.builder()
@@ -36,7 +36,7 @@ public class JwtService implements CommandLineRunner {
                 .compact();
     }
 
-    private Claims extractAllPayloads(String token) {
+    public Claims extractAllPayloads(String token) {
         return Jwts
                 .parser()
                 .verifyWith(getSignKey())
@@ -45,20 +45,20 @@ public class JwtService implements CommandLineRunner {
                 .getPayload();
     }
 
-    private <T> T extractClaims(String token, Function<Claims, T> claimsResolver) {
+    public <T> T extractClaims(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllPayloads(token);
         return claimsResolver.apply(claims);
     }
 
-    private String extractEmail(String token) {
+    public String extractEmail(String token) {
         return extractClaims(token, Claims::getSubject);
     }
 
-    private Date extractExpiration(String token) {
+    public Date extractExpiration(String token) {
         return extractClaims(token, Claims::getExpiration);
     }
 
-    private Boolean validateToken(String token, String email) {
+    public Boolean validateToken(String token, String email) {
         final String userEmailFetchedFromToken = extractEmail(token);
         return userEmailFetchedFromToken.equals(email) && !isTokenExpired(token);
     }
@@ -68,7 +68,7 @@ public class JwtService implements CommandLineRunner {
      * @param token JWT token
      * @return true if token is expired else false
      */
-    private Boolean isTokenExpired(String token) {
+    public Boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 
